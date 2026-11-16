@@ -791,7 +791,7 @@ document.addEventListener("DOMContentLoaded",function(){scan(document.body)});})
         <div><h4>협력·참여</h4><ul><li><a href="#p-partnership">협력기관·기업</a></li><li><a href="#p-partnership">후원자</a></li><li><a href="#p-volunteer">자원봉사자</a></li></ul></div>
       </div>
     </div>
-    <div class="fb"><address class="finfo"><span><b>사단법인 희망을 나누는 씨앗</b></span><span>주소 전남광주통합특별시 나주시 우정로10, A동 112호</span><span>대표번호 <a href="tel:07078018880">070-7801-8880</a></span><span>이메일 <a href="mailto:ssiat_nanum@naver.com">ssiat_nanum@naver.com</a></span><span>고유번호 242-82-00819</span></address><span>© 2026 희망을 나누는 씨앗. All rights reserved.</span></div>
+    <div class="fb"><address class="finfo"><span><b>사단법인 희망을 나누는 씨앗</b></span><span>주소 전남광주통합특별시 나주시 우정로10, A동 112호</span><span>대표번호 <a href="tel:07078018880">070-7801-8880</a></span><span>이메일 <a href="mailto:ssiat_nanum@naver.com">ssiat_nanum@naver.com</a></span><span>고유번호 242-82-00819</span></address><span>© 2026 희망을 나누는 씨앗. All rights reserved. · <a href="#admin" style="color:inherit">관리자</a></span></div>
   </div>
 </footer>
 
@@ -1037,7 +1037,7 @@ sub.addEventListener('change',e=>{if(e.target.name==='amt'){const c=document.get
 /* ===== 데이터 연동 + 관리자 기능 ===== */
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nl=v=>esc(v).replace(/\n/g,'<br>');
-const img=id=>id?'/_blob/'+encodeURIComponent(id):'';
+const img=id=>!id?'':String(id).includes('/')?encodeURI(String(id)):'/_blob/'+encodeURIComponent(id);
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 const BOARDS={news:'새소식',report:'보고서',recruit:'인재채용',story:'스토리','camp-report':'캠페인 결과보고',disclosure:'공시자료(투명경영)'};
 const BOARD_PAGE={news:'p-news',report:'p-report',recruit:'p-recruit',story:'p-story','camp-report':'p-camp-report',disclosure:'p-transparency'};
@@ -1128,6 +1128,7 @@ async function saveSubmission(f){
 /* ---------- 관리자 화면 ---------- */
 let admTab='posts',pending=null;
 function adminPage(){
+  if(!window.claude?.use)return `${title('관리자','새소식, 스토리, 보고서 같은 글은 관리자 프로그램(Pages CMS)에서 올립니다.')}<div class="empty"><b>GitHub 계정으로 로그인해서 글을 관리하세요.</b><span>저장하면 1~2분 뒤 홈페이지에 반영됩니다.</span><a class="btn btn-g" href="https://app.pagescms.org" target="_blank" rel="noopener">관리자 프로그램 열기</a></div>`;
   if(!S.ready&&window.claude?.use)return `${title('관리자')}<div class="empty"><b>권한을 확인하는 중입니다…</b></div>`;
   if(!S.admin)return `${title('관리자','홈페이지 글과 캠페인, 연혁, 신청 내역을 관리하는 화면입니다.')}<div class="empty"><b>관리 권한이 없습니다.</b><span>이 페이지의 편집 권한(Editor 이상)이 있는 계정으로 열면 관리 기능이 나타납니다.</span></div>`;
   const tab=(k,t)=>`<button type="button" role="tab" data-at="${k}" aria-selected="${admTab===k}">${t}</button>`;
@@ -1239,9 +1240,23 @@ document.getElementById('sub').addEventListener('click',async e=>{
     try{await S.db.doc('inbox/'+docId).set({items})}catch(err){t.disabled=false}}
 });
 
+
+/* ---------- 일반 웹사이트: Pages CMS가 저장한 data/*.json 읽기 ---------- */
+async function loadStatic(){
+  const get=async f=>{try{const r=await fetch('data/'+f+'.json',{cache:'no-cache'});if(!r.ok)return[];const j=await r.json();return Array.isArray(j)?j:[]}catch(e){return[]}};
+  const boards=Object.keys(BOARDS);
+  const lists=await Promise.all(boards.map(get));
+  const posts=[];
+  boards.forEach((b,k)=>lists[k].forEach((p,i)=>{if(p&&p.title)posts.push({...p,board:b,id:b+'-'+i,date:String(p.date||'').slice(0,10),body:p.body||'',createdAt:lists[k].length-i})}));
+  S.posts=posts;
+  S.camps=(await get('campaigns')).filter(c=>c&&c.title).map((c,i,a)=>({...c,id:'c'+i,goal:Number(c.goal)||0,raised:Number(c.raised)||0,status:c.status||'진행중',type:c.type||'나눔·후원 캠페인',desc:c.desc||'',createdAt:a.length-i}));
+  S.hist=(await get('history')).filter(h=>h&&h.ym).map((h,i)=>({...h,id:'h'+i,text:h.text||''}));
+  S.ready=true;fillDynamic();
+}
+
 /* ---------- 연결 ---------- */
 (async()=>{
-  if(!window.claude?.use)return;
+  if(!window.claude?.use){loadStatic();return;}
   const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);
   S.db=db;S.user=user;
   if(user){S.uid=await user.id();S.admin=await user.canEdit();}
