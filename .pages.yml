@@ -1,0 +1,212 @@
+# 희망을 나누는 씨앗 홈페이지 관리자(Pages CMS) 설정 파일입니다. 지우지 마세요.
+media:
+  input: images/uploads
+  output: /images/uploads
+  rename: random
+  categories: [image]
+
+content:
+  - name: boards
+    label: 게시판
+    type: group
+    items:
+      - name: news
+        label: 새소식
+        type: file
+        path: data/news.json
+        format: json
+        list: true
+        fields:
+          - name: title
+            label: 제목
+            type: string
+            required: true
+          - name: date
+            label: 날짜
+            type: date
+            options:
+              format: yyyy-MM-dd
+          - name: pinned
+            label: 공지로 맨 위에 고정
+            type: boolean
+          - name: image
+            label: 대표 사진 (선택)
+            type: image
+          - name: body
+            label: 내용
+            type: text
+      - name: story
+        label: 스토리
+        type: file
+        path: data/story.json
+        format: json
+        list: true
+        fields:
+          - name: title
+            label: 제목
+            type: string
+            required: true
+          - name: date
+            label: 날짜
+            type: date
+            options:
+              format: yyyy-MM-dd
+          - name: pinned
+            label: 공지로 맨 위에 고정
+            type: boolean
+          - name: image
+            label: 대표 사진 (선택)
+            type: image
+          - name: body
+            label: 내용
+            type: text
+      - name: report
+        label: 보고서
+        type: file
+        path: data/report.json
+        format: json
+        list: true
+        fields:
+          - name: title
+            label: 제목
+            type: string
+            required: true
+          - name: date
+            label: 날짜
+            type: date
+            options:
+              format: yyyy-MM-dd
+          - name: pinned
+            label: 공지로 맨 위에 고정
+            type: boolean
+          - name: image
+            label: 대표 사진 (선택)
+            type: image
+          - name: body
+            label: 내용
+            type: text
+      - name: camp_report
+        label: 캠페인 결과보고
+        type: file
+        path: data/camp-report.json
+        format: json
+        list: true
+        fields:
+          - name: title
+            label: 제목
+            type: string
+            required: true
+          - name: date
+            label: 날짜
+            type: date
+            options:
+              format: yyyy-MM-dd
+          - name: pinned
+            label: 공지로 맨 위에 고정
+            type: boolean
+          - name: image
+            label: 대표 사진 (선택)
+            type: image
+          - name: body
+            label: 내용
+            type: text
+      - name: disclosure
+        label: 공시자료 (투명경영)
+        type: file
+        path: data/disclosure.json
+        format: json
+        list: true
+        fields:
+          - name: title
+            label: 제목
+            type: string
+            required: true
+          - name: date
+            label: 날짜
+            type: date
+            options:
+              format: yyyy-MM-dd
+          - name: pinned
+            label: 공지로 맨 위에 고정
+            type: boolean
+          - name: image
+            label: 대표 사진 (선택)
+            type: image
+          - name: body
+            label: 내용
+            type: text
+      - name: recruit
+        label: 인재채용
+        type: file
+        path: data/recruit.json
+        format: json
+        list: true
+        fields:
+          - name: title
+            label: 제목
+            type: string
+            required: true
+          - name: date
+            label: 날짜
+            type: date
+            options:
+              format: yyyy-MM-dd
+          - name: pinned
+            label: 공지로 맨 위에 고정
+            type: boolean
+          - name: image
+            label: 대표 사진 (선택)
+            type: image
+          - name: body
+            label: 내용
+            type: text
+  - name: campaigns
+    label: 캠페인
+    type: file
+    path: data/campaigns.json
+    format: json
+    list: true
+    fields:
+      - name: title
+        label: 캠페인 이름
+        type: string
+        required: true
+      - name: type
+        label: 종류
+        type: select
+        options:
+          values: [나눔·후원 캠페인, 인식개선·참여 캠페인]
+      - name: status
+        label: 상태
+        type: select
+        options:
+          values: [진행중, 종료]
+      - name: period
+        label: 기간 (예 2026.12.01 ~ 2027.01.31)
+        type: string
+      - name: goal
+        label: 목표 금액 (원)
+        type: number
+      - name: raised
+        label: 현재 모금액 (원)
+        type: number
+      - name: desc
+        label: 소개
+        type: text
+      - name: image
+        label: 대표 사진 (선택)
+        type: image
+  - name: history
+    label: 연혁
+    type: file
+    path: data/history.json
+    format: json
+    list: true
+    fields:
+      - name: ym
+        label: 연월 (예 2026.03)
+        type: string
+        required: true
+      - name: text
+        label: 내용
+        type: text
